@@ -1,0 +1,43 @@
+service: web-training
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-plugin-typescript
+  - serverless-plugin-optimize
+  - serverless-localstack
+  # - serverless-plugin-warmup
+
+# custom:
+#   # Enable warmup on all functions (only for production and staging)
+#   warmup:
+#       - production
+#       - staging
+useDotenv: true
+
+custom:
+  localstack:
+    debug: true
+    stages:
+      - local
+    host: http://localstack
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: local
+  # deploymentBucket:
+  #   name: ${self:service}-${opt:stage}-deployment-bucket
+
+package:
+  individually: true
+
+functions:
+  main:
+    handler: src/main.handler
+    events:
+      - http:
+          method: any
+          path: /{any+}
+    environment:
+      DATABASE_URL: ${env:DATABASE_URL}
